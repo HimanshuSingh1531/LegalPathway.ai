@@ -1,5 +1,6 @@
 package com.legalpathways.ai.network
 
+import com.legalpathways.ai.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -10,7 +11,7 @@ object RetrofitClient {
 
     // Change this in BuildConfig or directly for your device/emulator
     // 10.0.2.2 is the localhost alias for Android emulator
-    private val BASE_URL = "http://10.0.2.2:8000/"
+    private val BASE_URL: String get() = BuildConfig.BASE_URL
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

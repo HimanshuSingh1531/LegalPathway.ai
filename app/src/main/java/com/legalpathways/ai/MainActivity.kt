@@ -3,60 +3,28 @@ package com.legalpathways.ai
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.navigation.compose.*
-import com.legalpathways.ai.ui.screens.*
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.ui.Modifier
+import androidx.navigation.compose.rememberNavController
+import com.legalpathways.ai.ui.LegalNavHost
 import com.legalpathways.ai.ui.theme.LegalPathwaysTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
-            LegalPathwaysApp()
-        }
-    }
-}
-
-@Composable
-fun LegalPathwaysApp() {
-    LegalPathwaysTheme {
-        val navController = rememberNavController()
-
-        NavHost(
-            navController = navController,
-            startDestination = "home"
-        ) {
-
-            composable("home") {
-                HomeScreen(
-                    onNavigateToChat = {
-                        navController.navigate("chat")
-                    },
-                    onNavigateToRoadmap = {
-                        navController.navigate("roadmap")
-                    }
-                )
-            }
-
-            composable("chat") {
-                CounselorScreen(
-                    onBack = { navController.popBackStack() }
-                )
-            }
-
-            composable("roadmap") {
-                RoadmapScreen(
-                    onBack = { navController.popBackStack() }
-                )
-            }
-
-            composable("layer0") {
-                Layer0Screen(navController)
-            }
-
-            composable("layer1") {
-                Layer1Screen(navController)
+            LegalPathwaysTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color    = MaterialTheme.colorScheme.background
+                ) {
+                    val navController = rememberNavController()
+                    LegalNavHost(navController = navController)
+                }
             }
         }
     }
