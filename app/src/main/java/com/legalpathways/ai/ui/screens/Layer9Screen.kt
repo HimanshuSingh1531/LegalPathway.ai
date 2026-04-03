@@ -18,7 +18,7 @@ import com.legalpathways.ai.ui.components.*
 import com.legalpathways.ai.ui.theme.*
 import com.legalpathways.ai.viewmodel.MainViewModel
 import com.legalpathways.ai.viewmodel.UiState
-
+import com.legalpathways.ai.ui.components.DropdownSelector
 fun precedentWeight(court: String) = when {
     court.contains("Supreme") -> 3
     court.contains("High")    -> 2

@@ -22,7 +22,7 @@ import com.legalpathways.ai.viewmodel.UiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-
+import com.legalpathways.ai.ui.components.DropdownSelector
 class Layer2ViewModel : ViewModel() {
     private val api = RetrofitClient.apiService
 

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.legalpathways.ai.model.EvidenceItem
 import com.legalpathways.ai.ui.components.*
+import com.legalpathways.ai.ui.components.DropdownSelector
 import com.legalpathways.ai.ui.theme.*
 import com.legalpathways.ai.viewmodel.MainViewModel
 import com.legalpathways.ai.viewmodel.UiState

@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.legalpathways.ai.model.Layer0Request
@@ -204,120 +205,98 @@ fun Layer0Screen(onBack: () -> Unit, vm: MainViewModel = viewModel()) {
                                         }
                                     }
                                 )
-                                6 -> ReviewStepModern(relStatus, religion, children, income, risk)
+                                6 -> ReviewStepModern(
+                                    rel = relStatus,
+                                    religion = religion,
+                                    children = children,
+                                    income = income,
+                                    risk = risk
+                                )
+                                else -> {}
                             }
                         }
 
-                        // Bottom action bar
-                        Surface(
+                        // Bottom button bar
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(80.dp),
-                            color = MaterialTheme.colorScheme.surface,
-                            shadowElevation = 8.dp
+                                .padding(horizontal = 16.dp, vertical = 12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(16.dp),
-                                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                // PREVIOUS button - ALWAYS visible in all modes
-                                IconButton(
-                                    onClick = { if (step > 1) step-- },
-                                    enabled = step > 1,
+                            // Back button (always shown except on step 1)
+                            if (step > 1) {
+                                OutlinedButton(
+                                    onClick = { step-- },
                                     modifier = Modifier
-                                        .size(48.dp)
-                                        .background(
-                                            color = if (step > 1)
-                                                NavyMid
-                                            else
-                                                MaterialTheme.colorScheme.surfaceVariant,
-                                            shape = CircleShape
-                                        )
+                                        .height(52.dp)
+                                        .width(56.dp),
+                                    border = BorderStroke(1.5.dp, NavyMid),
+                                    colors = ButtonDefaults.outlinedButtonColors(contentColor = NavyMid),
+                                    contentPadding = PaddingValues(0.dp)
                                 ) {
-                                    Icon(
-                                        Icons.Default.ChevronLeft,
-                                        contentDescription = "Previous Step",
-                                        tint = if (step > 1)
-                                            Color.White
-                                        else
-                                            MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.size(24.dp)
-                                    )
+                                    Icon(Icons.Default.ChevronLeft, contentDescription = "Previous", modifier = Modifier.size(22.dp))
                                 }
+                            }
 
-                                // PROGRESS dots
-                                Row(
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    repeat(6) { i ->
-                                        Box(
-                                            modifier = Modifier
-                                                .size(if (i == step - 1) 10.dp else 8.dp)
-                                                .background(
-                                                    color = if (i < step)
-                                                        NavyMid
-                                                    else
-                                                        MaterialTheme.colorScheme.surfaceVariant,
-                                                    shape = CircleShape
-                                                )
-                                        )
-                                    }
-                                }
-
-                                // NEXT button (sirf step 1-5 pe)
-                                if (step < 6) {
-                                    IconButton(
-                                        onClick = { step++ },
+                            // Progress dots
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .wrapContentWidth(Alignment.CenterHorizontally)
+                            ) {
+                                repeat(6) { i ->
+                                    Box(
                                         modifier = Modifier
-                                            .size(48.dp)
+                                            .size(if (i == step - 1) 10.dp else 8.dp)
                                             .background(
-                                                color = NavyMid,
+                                                color = if (i < step) NavyMid else NavyMid.copy(alpha = 0.25f),
                                                 shape = CircleShape
                                             )
-                                    ) {
-                                        Icon(
-                                            Icons.Default.ChevronRight,
-                                            contentDescription = "Next Step",
-                                            tint = Color.White,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    }
+                                    )
                                 }
+                            }
 
-                                // SUBMIT button (sirf step 6 pe)
-                                if (step == 6) {
-                                    Button(
-                                        onClick = {
-                                            vm.submitLayer0(
-                                                request = Layer0Request(
-                                                    relationshipStatus = relStatus,
-                                                    religion = religion,
-                                                    marriageAct = marriageAct,
-                                                    childrenFlag = children,        // hasChildren ❌ → childrenFlag ✅
-                                                    incomeRange = income,           // incomeBracket ❌ → incomeRange ✅
-                                                    riskIndicator = risk            // listOf(risk) ❌ → simply risk ✅
-                                                )
-                                            )
-                                        },
-                                        modifier = Modifier
-                                            .wrapContentWidth()
-                                            .height(48.dp),
-                                        colors = ButtonDefaults.buttonColors(containerColor = NavyMid),
-                                        shape = RoundedCornerShape(24.dp)
-                                    ) {
-                                        Icon(
-                                            Icons.Default.Send,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
+                            // Next button on MCQ steps, Submit on review step
+                            if (step < 6) {
+                                Button(
+                                    onClick = { step++ },
+                                    modifier = Modifier
+                                        .height(52.dp)
+                                        .width(56.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = NavyMid),
+                                    shape = RoundedCornerShape(26.dp),
+                                    contentPadding = PaddingValues(0.dp)
+                                ) {
+                                    Icon(Icons.Default.ChevronRight, contentDescription = "Next", tint = Color.White, modifier = Modifier.size(22.dp))
+                                }
+                            } else {
+                                Button(
+                                    onClick = {
+                                        val request = Layer0Request(
+                                            relationshipStatus = relStatus,
+                                            religion = religion,
+                                            marriageAct = marriageAct,
+                                            childrenFlag = children,
+                                            incomeRange = income,
+                                            riskIndicator = risk
                                         )
-                                        Spacer(Modifier.width(6.dp))
-                                        Text("Submit", fontWeight = FontWeight.Bold)
-                                    }
+                                        vm.submitLayer0(request)
+                                    },
+                                    modifier = Modifier
+                                        .height(52.dp)
+                                        .weight(1f),
+                                    colors = ButtonDefaults.buttonColors(containerColor = NavyMid),
+                                    shape = RoundedCornerShape(26.dp)
+                                ) {
+                                    Text(
+                                        " Submit",
+                                        color = Color.White,
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 15.sp
+                                    )
                                 }
                             }
                         }
@@ -328,60 +307,51 @@ fun Layer0Screen(onBack: () -> Unit, vm: MainViewModel = viewModel()) {
     }
 }
 
-// ==========================================
-// FIXED MCQ STEP DISPLAY
-// - Question FIXED at top
-// - Options don't push question
-// - Clear visual selection with COLOR FILL + BORDER
-// ==========================================
+/**
+ * MCQ Step Display with Modern Styling - FIXED text visibility
+ */
 @Composable
 fun MCQStepDisplayFixed(
-    mcq: MCQQuestion,
+    question: MCQQuestion,
     selectedValue: String,
     onSelect: (String) -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight(),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .padding(vertical = 40.dp),
+        verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
-        // ─── FIXED QUESTION (TOP) ───
+        // Question header
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight(),
-            shape = RoundedCornerShape(16.dp),
-            color = NavyMid.copy(alpha = 0.08f),
-            border = BorderStroke(1.5.dp, NavyMid.copy(alpha = 0.3f))
+            shape = RoundedCornerShape(20.dp),
+            color = NavyMid,
+            shadowElevation = 6.dp
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(20.dp),
+                    .padding(24.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    mcq.question,
-                    style = MaterialTheme.typography.titleMedium,
+                    question.question,
+                    style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
+                    color = Color.White,
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    fontSize = 17.sp,
+                    fontSize = 18.sp,
                     lineHeight = 24.sp
                 )
             }
         }
-        Spacer(modifier = Modifier.height(20.dp))
 
-        // ─── OPTIONS (BELOW QUESTION) ───
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            mcq.options.forEachIndexed { index, (value, label) ->
+        // Options
+        Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            question.options.forEachIndexed { index, (value, label) ->
                 MCQOptionButtonFixed(
                     label = label,
                     letter = ('A' + index).toString(),
@@ -390,18 +360,15 @@ fun MCQStepDisplayFixed(
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(20.dp))
     }
 }
 
-// ==========================================
-// FIXED MCQ OPTION BUTTON
-// - BLUE FILL COLOR (NavyMid)
-// - VISIBLE BORDER when selected
-// - CHECKMARK icon
-// - 600ms animation
-// ==========================================
+/**
+ * Individual MCQ Option Button - FIXED for text visibility
+ * - Dark text color (0xFF1A1A1A) on white background for maximum contrast
+ * - Proper font sizes for readability
+ * - White text on navy when selected
+ */
 @Composable
 fun MCQOptionButtonFixed(
     label: String,
@@ -413,7 +380,10 @@ fun MCQOptionButtonFixed(
 
     LaunchedEffect(isSelected) {
         if (isSelected) {
-            fillAnimation.animateTo(1f, animationSpec = tween(600, easing = EaseOutCubic))
+            fillAnimation.animateTo(
+                1f,
+                animationSpec = tween(500, easing = EaseOutCubic)
+            )
         } else {
             fillAnimation.snapTo(0f)
         }
@@ -424,24 +394,26 @@ fun MCQOptionButtonFixed(
             .fillMaxWidth()
             .height(56.dp)
             .clip(RoundedCornerShape(28.dp))
-            .clickable(enabled = !isSelected) { onClick() }
+            .clickable { onClick() }
     ) {
-        // ─── ANIMATED FILL (BLUE COLOR) ───
+        // ─── BACKGROUND FILL DRAWN FIRST (behind content) ───
         if (fillAnimation.value > 0f) {
-            Surface(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth(fillAnimation.value)
                     .fillMaxHeight()
-                    .align(Alignment.CenterStart),
-                color = NavyMid.copy(alpha = 0.75f),
-                shape = RoundedCornerShape(28.dp)
-            ) {}
+                    .align(Alignment.CenterStart)
+                    .background(
+                        color = NavyMid,
+                        shape = RoundedCornerShape(28.dp)
+                    )
+            )
         }
 
-        // ─── WHITE BACKGROUND + BORDER + CONTENT ───
+        // ─── BORDER + CONTENT DRAWN ON TOP OF FILL ───
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = Color.White,
+            color = Color.Transparent,
             border = BorderStroke(
                 width = if (isSelected) 3.dp else 2.dp,
                 color = if (isSelected) NavyMid else NavyMid.copy(alpha = 0.25f)
@@ -458,7 +430,7 @@ fun MCQOptionButtonFixed(
                 // ─── LETTER CIRCLE ───
                 Surface(
                     shape = CircleShape,
-                    color = if (isSelected) NavyMid else NavyMid.copy(alpha = 0.2f),
+                    color = if (isSelected) Color.White.copy(alpha = 0.2f) else NavyMid.copy(alpha = 0.12f),
                     modifier = Modifier.size(36.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
@@ -472,13 +444,16 @@ fun MCQOptionButtonFixed(
                     }
                 }
 
-                // ─── OPTION LABEL ───
+                // ─── OPTION LABEL - text color matches background state ───
                 Text(
                     label,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = NavyDeep,
+                    color = if (isSelected) Color.White else Color(0xFF1A1A1A),
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    modifier = Modifier.weight(1f)
+                    fontSize = 16.sp,
+                    modifier = Modifier.weight(1f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
 
                 // ─── CHECKMARK (when selected) ───
@@ -486,7 +461,7 @@ fun MCQOptionButtonFixed(
                     Icon(
                         Icons.Default.CheckCircle,
                         contentDescription = "Selected",
-                        tint = NavyMid,
+                        tint = Color.White,
                         modifier = Modifier.size(24.dp)
                     )
                 }
@@ -531,7 +506,7 @@ fun ReviewStepModern(rel: String, religion: String, children: Boolean, income: S
         }
 
         Text(
-            " Click Submit to get your legal position analysis",
+            "Click Submit to get your legal position analysis",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -569,53 +544,108 @@ fun mapReligionToAct(religion: String): String = when (religion) {
 @Composable
 fun Layer0Result(data: com.legalpathways.ai.model.Layer0Data, onReset: () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text("📍 Your Legal Position", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Bold)
+        // Title
+        Text(
+            "Your Legal Position",
+            style = MaterialTheme.typography.headlineMedium,
+            color = Color(0xFF1A1A2E),
+            fontWeight = FontWeight.Bold
+        )
 
         data.applicableLaw?.let {
-            Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = NavyMid.copy(alpha = 0.06f))) {
-                Column(modifier = Modifier.padding(14.dp)) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     SectionHeader("Applicable Law", Icons.Default.MenuBook)
-                    Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF2D2D2D)
+                    )
                 }
             }
         }
 
         if (!data.allowedActions.isNullOrEmpty()) {
-            Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = EmeraldAccent.copy(alpha = 0.06f))) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    SectionHeader("Allowed Actions", Icons.Default.CheckCircle)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.CheckCircle, contentDescription = null, tint = EmeraldAccent, modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Allowed Actions", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = EmeraldAccent)
+                    }
+                    Spacer(Modifier.height(10.dp))
                     BulletList(data.allowedActions, EmeraldAccent)
                 }
             }
         }
 
         if (!data.blockedActions.isNullOrEmpty()) {
-            Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = CrimsonAccent.copy(alpha = 0.06f))) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    SectionHeader("Blocked Actions", Icons.Default.Block)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.Block, contentDescription = null, tint = CrimsonAccent, modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Blocked Actions", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = CrimsonAccent)
+                    }
+                    Spacer(Modifier.height(10.dp))
                     BulletList(data.blockedActions, CrimsonAccent)
                 }
             }
         }
 
         data.recommendedNextStep?.let {
-            Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = GoldPrimary.copy(alpha = 0.06f))) {
-                Column(modifier = Modifier.padding(14.dp)) {
-                    SectionHeader("Recommended Next Step", Icons.Default.ArrowForward)
-                    Text(it, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+                shape = RoundedCornerShape(14.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.ArrowForward, contentDescription = null, tint = GoldPrimary, modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text("Recommended Next Step", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = GoldPrimary)
+                    }
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color(0xFF2D2D2D)
+                    )
                 }
             }
         }
 
+        Spacer(Modifier.height(4.dp))
+
         OutlinedButton(
             onClick = onReset,
-            modifier = Modifier.fillMaxWidth(),
-            border = BorderStroke(1.dp, NavyMid),
-            colors = ButtonDefaults.outlinedButtonColors(contentColor = NavyMid)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            border = BorderStroke(1.5.dp, NavyMid),
+            colors = ButtonDefaults.outlinedButtonColors(contentColor = NavyMid),
+            shape = RoundedCornerShape(26.dp)
         ) {
-            Icon(Icons.Default.Refresh, null, modifier = Modifier.size(16.dp))
-            Spacer(Modifier.width(6.dp))
-            Text("New Assessment")
+            Icon(Icons.Default.Refresh, null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.width(8.dp))
+            Text("New Assessment", fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
         }
     }
 }
