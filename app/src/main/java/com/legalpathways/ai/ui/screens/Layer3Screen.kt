@@ -18,7 +18,7 @@ import com.legalpathways.ai.ui.components.*
 import com.legalpathways.ai.ui.theme.*
 import com.legalpathways.ai.viewmodel.MainViewModel
 import com.legalpathways.ai.viewmodel.UiState
-
+import com.legalpathways.ai.ui.components.DropdownSelector
 fun typeColor(type: String): Pair<Color, Color> = when {
     type.lowercase().contains("financial") && type.lowercase().contains("legal") -> Pair(Color(0xFF6B21A8), Color(0xFFF3E8FF))
     type.lowercase().contains("both")       -> Pair(Color(0xFF92400E), Color(0xFFFFF3E0))

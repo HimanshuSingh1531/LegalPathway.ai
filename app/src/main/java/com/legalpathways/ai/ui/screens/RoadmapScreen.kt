@@ -16,7 +16,7 @@ import com.legalpathways.ai.ui.components.*
 import com.legalpathways.ai.ui.theme.*
 import com.legalpathways.ai.viewmodel.MainViewModel
 import com.legalpathways.ai.viewmodel.UiState
-
+import com.legalpathways.ai.ui.components.DropdownSelector
 val marriageOptions = listOf("hindu" to "Hindu (HMA)", "muslim" to "Muslim", "christian" to "Christian", "sma" to "Special Marriage Act")
 val roleOptions     = listOf("husband" to "Husband", "wife" to "Wife")
 

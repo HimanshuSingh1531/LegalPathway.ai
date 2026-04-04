@@ -17,6 +17,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import com.legalpathways.ai.ui.theme.*
 
+import androidx.compose.ui.text.style.TextOverflow
+
 /**
  * Modern MCQ Screen with Auto-Advance
  * - Beautiful purple gradient background matching reference design
@@ -24,6 +26,7 @@ import com.legalpathways.ai.ui.theme.*
  * - Auto-advances to next question on selection
  * - Fill animation on tap
  * - Optional prev/next navigation at bottom
+ * - FIXED: Improved text visibility with proper contrast
  */
 
 //data class MCQQuestion(
@@ -222,6 +225,8 @@ fun MCQScreen(
  * - Fill animation on tap (600ms)
  * - Calls onAnimationComplete when fill animation finishes
  * - Auto-advances when tapped
+ * - FIXED: Dark text color (0xFF3E2454) for better contrast against white background
+ * - FIXED: White text only when selected (after fill animation)
  */
 @Composable
 fun MCQOptionButtonNew(
@@ -247,12 +252,26 @@ fun MCQOptionButtonNew(
             .fillMaxWidth()
             .height(56.dp)
             .clip(RoundedCornerShape(28.dp))
-            .clickable(enabled = !isSelected) { onClick() }
+            .clickable { onClick() }
     ) {
-        // Border + Content (behind the fill)
+        // Background fill animation drawn FIRST (behind content)
+        if (fillAnimation.value > 0f) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(fillAnimation.value)
+                    .fillMaxHeight()
+                    .align(Alignment.CenterStart)
+                    .background(
+                        color = Color(0xFFB092D6),
+                        shape = RoundedCornerShape(28.dp)
+                    )
+            )
+        }
+
+        // Border + Content drawn ON TOP of fill
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = Color.White,
+            color = Color.Transparent,
             border = BorderStroke(
                 width = if (isSelected) 2.5.dp else 2.dp,
                 color = Color(0xFFB092D6).copy(alpha = if (isSelected) 1f else 0.4f)
@@ -269,7 +288,7 @@ fun MCQOptionButtonNew(
                 // Letter circle
                 Surface(
                     shape = CircleShape,
-                    color = Color(0xFFB092D6).copy(alpha = if (isSelected) 1f else 0.3f),
+                    color = if (isSelected) Color.White.copy(alpha = 0.25f) else Color(0xFFB092D6).copy(alpha = 0.15f),
                     modifier = Modifier.size(36.dp)
                 ) {
                     Box(contentAlignment = Alignment.Center) {
@@ -283,16 +302,18 @@ fun MCQOptionButtonNew(
                     }
                 }
 
-                // Label text
+                // Label text - always readable regardless of selection state
                 Text(
                     label,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = if (isSelected) Color.White else Color(0xFF6B4A8A),
+                    color = if (isSelected) Color.White else Color(0xFF3E2454),
                     fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
                 )
 
-                // Checkmark or placeholder
+                // Checkmark when selected
                 if (isSelected) {
                     Icon(
                         Icons.Default.CheckCircle,
@@ -302,18 +323,6 @@ fun MCQOptionButtonNew(
                     )
                 }
             }
-        }
-
-        // Background fill animation (overlay)
-        if (fillAnimation.value > 0f) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxWidth(fillAnimation.value)
-                    .fillMaxHeight()
-                    .align(Alignment.CenterStart),
-                color = Color(0xFFB092D6).copy(alpha = 0.7f),
-                shape = RoundedCornerShape(28.dp)
-            ) {}
         }
     }
 }
